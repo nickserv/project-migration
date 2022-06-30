@@ -7,27 +7,25 @@ const octokit = new Octokit({
 type Project = Awaited<ReturnType<typeof octokit.rest.projects.get>>["data"]
 
 async function getRepositoryProjects(owner: string): Promise<Project[]> {
-  const repos = (await octokit.rest.repos.listForOrg({ org: owner })).data
-
   return (
     await Promise.all(
-      repos
+      (await octokit.rest.repos.listForOrg({ org: owner })).data
         .filter((repo) => repo.has_projects)
-        .map(async ({ name: repo }) => {
-          const { data } = await octokit.rest.projects.listForRepo({
-            owner,
-            repo,
-          })
-          return data
-        }),
+        .map(
+          async ({ name: repo }) =>
+            (
+              await octokit.rest.projects.listForRepo({ owner, repo })
+            ).data,
+        ),
     )
   ).flat()
 }
 
 async function getProjects(org: string): Promise<Project[]> {
-  const projects = (await octokit.rest.projects.listForOrg({ org })).data
-
-  return [...projects, ...(await getRepositoryProjects(org))]
+  return [
+    ...(await octokit.rest.projects.listForOrg({ org })).data,
+    ...(await getRepositoryProjects(org)),
+  ]
 }
 
 ;(async () => {
