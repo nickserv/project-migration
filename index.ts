@@ -1,15 +1,22 @@
 import { Octokit } from "octokit"
+import { OctokitResponse } from "@octokit/types"
 
 const octokit = new Octokit({
   auth: "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",
 })
 
-type Project = Awaited<ReturnType<typeof octokit.rest.projects.get>>["data"]
+type Response = Promise<OctokitResponse<unknown>>
+type ResponseData<T extends () => Response> = Awaited<ReturnType<T>>["data"]
+type Project = ResponseData<typeof octokit.rest.projects.get>
+type Repo = ResponseData<typeof octokit.rest.repos.get>
 
-async function getRepositoryProjects(owner: string): Promise<Project[]> {
+async function listForRepositories(
+  owner: string,
+  repos: Repo[],
+): Promise<Project[]> {
   return (
     await Promise.all(
-      (await octokit.rest.repos.listForOrg({ org: owner })).data
+      repos
         .filter((repo) => repo.has_projects)
         .map(
           async ({ name: repo }) =>
@@ -21,14 +28,40 @@ async function getRepositoryProjects(owner: string): Promise<Project[]> {
   ).flat()
 }
 
-async function getProjects(org: string): Promise<Project[]> {
+async function listForUser(username: string): Promise<Project[]> {
+  return [
+    ...(await octokit.rest.projects.listForUser({ username })).data,
+    ...(await listForRepositories(
+      username,
+      (
+        await octokit.rest.repos.listForUser({ username })
+      ).data as Repo[],
+    )),
+  ]
+}
+
+async function listForOrg(org: string): Promise<Project[]> {
   return [
     ...(await octokit.rest.projects.listForOrg({ org })).data,
-    ...(await getRepositoryProjects(org)),
+    ...(await listForRepositories(
+      org,
+      (
+        await octokit.rest.repos.listForOrg({ org })
+      ).data as Repo[],
+    )),
   ]
 }
 
 ;(async () => {
-  const projects = await getProjects("testing-library")
-  console.log(projects.map((project) => project.name))
+  const { login } = (await octokit.rest.users.getAuthenticated()).data
+  const projects = await listForUser(login)
+  const orgs = (
+    await Promise.all(
+      (
+        await octokit.rest.orgs.listForAuthenticatedUser()
+      ).data.map((org) => listForOrg(org.login)),
+    )
+  ).flat()
+  const allProjects = [...projects, ...orgs]
+  console.log(allProjects)
 })()
