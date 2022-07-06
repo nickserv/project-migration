@@ -20,9 +20,10 @@ async function listForRepositories(
         .filter((repo) => repo.has_projects && !repo.archived)
         .map(
           async ({ name: repo }) =>
-            (
-              await octokit.rest.projects.listForRepo({ owner, repo })
-            ).data,
+            await octokit.paginate(octokit.rest.projects.listForRepo, {
+              owner,
+              repo,
+            }),
         ),
     )
   ).flat()
@@ -30,24 +31,28 @@ async function listForRepositories(
 
 async function listForUser(username: string): Promise<Project[]> {
   return [
-    ...(await octokit.rest.projects.listForUser({ username })).data,
+    ...(await octokit.paginate(octokit.rest.projects.listForUser, {
+      username,
+    })),
     ...(await listForRepositories(
       username,
-      (
-        await octokit.rest.repos.listForUser({ username })
-      ).data as Repo[],
+      (await octokit.paginate(octokit.rest.repos.listForUser, {
+        username,
+      })) as Repo[],
     )),
   ]
 }
 
 async function listForOrg(org: string): Promise<Project[]> {
   return [
-    ...(await octokit.rest.projects.listForOrg({ org })).data,
+    ...(await octokit.paginate(octokit.rest.projects.listForOrg, {
+      org,
+    })),
     ...(await listForRepositories(
       org,
-      (
-        await octokit.rest.repos.listForOrg({ org })
-      ).data as Repo[],
+      (await octokit.paginate(octokit.rest.repos.listForOrg, {
+        org,
+      })) as Repo[],
     )),
   ]
 }
@@ -58,8 +63,8 @@ async function listForOrg(org: string): Promise<Project[]> {
   const orgs = (
     await Promise.all(
       (
-        await octokit.rest.orgs.listForAuthenticatedUser()
-      ).data.map((org) => listForOrg(org.login)),
+        await octokit.paginate(octokit.rest.orgs.listForAuthenticatedUser)
+      ).map((org) => listForOrg(org.login)),
     )
   ).flat()
   for (const project of [...projects, ...orgs]) console.log(project.html_url)
