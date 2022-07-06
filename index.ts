@@ -57,15 +57,15 @@ async function listForOrg(org: string): Promise<Project[]> {
   ]
 }
 
+function logProjects(projects: Project[]) {
+  for (const project of projects) console.log(project.html_url)
+}
+
 ;(async () => {
   const { login } = (await octokit.rest.users.getAuthenticated()).data
-  const projects = await listForUser(login)
-  const orgs = (
-    await Promise.all(
-      (
-        await octokit.paginate(octokit.rest.orgs.listForAuthenticatedUser)
-      ).map((org) => listForOrg(org.login)),
-    )
-  ).flat()
-  for (const project of [...projects, ...orgs]) console.log(project.html_url)
+  logProjects(await listForUser(login))
+  const orgs = await octokit.paginate(
+    octokit.rest.orgs.listForAuthenticatedUser,
+  )
+  for (const { login } of orgs) logProjects(await listForOrg(login))
 })()
