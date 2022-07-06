@@ -62,6 +62,5 @@ async function listForOrg(org: string): Promise<Project[]> {
       ).data.map((org) => listForOrg(org.login)),
     )
   ).flat()
-  const allProjects = [...projects, ...orgs]
-  console.log(allProjects)
+  for (const project of [...projects, ...orgs]) console.log(project.html_url)
 })()
