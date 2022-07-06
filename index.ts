@@ -17,7 +17,7 @@ async function listForRepositories(
   return (
     await Promise.all(
       repos
-        .filter((repo) => repo.has_projects)
+        .filter((repo) => repo.has_projects && !repo.archived)
         .map(
           async ({ name: repo }) =>
             (
