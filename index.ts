@@ -1,9 +1,8 @@
 import { Octokit } from "octokit"
 import { OctokitResponse } from "@octokit/types"
+import "dotenv/config"
 
-const octokit = new Octokit({
-  auth: "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",
-})
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN })
 
 type Response = Promise<OctokitResponse<unknown>>
 type ResponseData<T extends () => Response> = Awaited<ReturnType<T>>["data"]
