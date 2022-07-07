@@ -1,5 +1,5 @@
 {
-  "name": "projects",
+  "name": "project-migration",
   "private": true,
   "scripts": {
     "test": "ts-node ."
