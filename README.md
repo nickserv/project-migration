@@ -1,6 +1,6 @@
 # Project Migration
 
-A tool for finding old GitHub Projects to use with Project Migration
+A tool for finding old GitHub Projects to use with [Project Migration](https://docs.github.com/en/issues/trying-out-the-new-projects-experience/migrating-your-project)
 
 ## Usage
 
