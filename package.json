@@ -2,14 +2,14 @@
   "name": "project-migration",
   "private": true,
   "scripts": {
-    "test": "ts-node ."
+    "test": "ts-node --esm index.ts"
   },
   "dependencies": {
     "dotenv": "^16.0.1",
-    "octokit": "^1.8.1",
+    "octokit": "^2.0.3",
     "prettier": "^2.7.1",
     "prettier-config-nick": "^1.0.2",
-    "ts-node": "^10.8.1",
+    "ts-node": "^10.9.1",
     "typescript": "^4.7.4"
   },
   "prettier": "prettier-config-nick"
