@@ -2,7 +2,7 @@
   "name": "project-migration",
   "private": true,
   "scripts": {
-    "test": "ts-node --esm index.ts"
+    "start": "ts-node --esm index.ts"
   },
   "dependencies": {
     "dotenv": "^16.0.1",
