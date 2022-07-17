@@ -92,10 +92,14 @@ async function getAuthToken(): Promise<string> {
     ]
   }
 
-  const { login } = (await octokit.rest.users.getAuthenticated()).data
-  logProjects(await listForUser(login))
-  const orgs = await octokit.paginate(
-    octokit.rest.orgs.listForAuthenticatedUser,
-  )
-  for (const { login } of orgs) logProjects(await listForOrg(login))
+  let username = process.argv[2]
+  if (username !== undefined) {
+    const user = (await octokit.rest.users.getByUsername({ username })).data
+    const list = user.type === "User" ? listForUser : listForOrg
+    logProjects(await list(username))
+  } else {
+    const authenticated = await octokit.rest.users.getAuthenticated()
+    username = authenticated.data.login
+    logProjects(await listForUser(username))
+  }
 })()
