@@ -7,6 +7,8 @@ A tool for finding old GitHub Projects to use with [Project Migration](https://d
 1. `npm install`
 2. `npm start`
 
+To migrate old projects found by this tool, [enable the Project Migration feature preview on GitHub](https://docs.github.com/en/get-started/using-github/exploring-early-access-releases-with-feature-preview) and visit the outputted links to [migrate from projects (classic)](https://docs.github.com/en/issues/planning-and-tracking-with-projects/creating-projects/migrating-from-projects-classic).
+
 ## License
 
 [Table Icon](https://primer.style/octicons/table-24) from [Octicons](https://primer.style/octicons/) [[MIT License © 2022 GitHub Inc.](https://github.com/primer/octicons/blob/main/LICENSE)]
